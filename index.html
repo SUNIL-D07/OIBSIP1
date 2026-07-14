@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BMI Index — Body Mass Reading</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #F5F7F8;
+    --paper: #FFFFFF;
+    --ink: #16212B;
+    --ink-soft: #5B6B76;
+    --line: #DDE4E8;
+    --teal: #0E6F6C;
+    --teal-deep: #0A4F4D;
+    --amber: #D98B2B;
+    --under: #6FA8C9;
+    --normal: #0E6F6C;
+    --over: #D98B2B;
+    --obese: #C1503E;
+    --radius: 14px;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    margin:0;
+    padding:0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+  }
+
+  body{
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 28px 28px;
+    background-position: -1px -1px;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 20px;
+  }
+
+  .sheet{
+    width: 100%;
+    max-width: 980px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: 0 1px 2px rgba(22,33,43,0.04), 0 12px 40px rgba(22,33,43,0.06);
+    overflow: hidden;
+  }
+
+  /* ===== Header / masthead ===== */
+  .masthead{
+    padding: 36px 44px 28px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .masthead .brand{
+    display:flex;
+    align-items:baseline;
+    gap: 14px;
+  }
+
+  .brand-mark{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--teal);
+    border: 1px solid var(--teal);
+    padding: 3px 7px;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+
+  h1{
+    font-family: 'Fraunces', serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-size: 27px;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+
+  .masthead .meta{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    text-align: right;
+    line-height: 1.6;
+  }
+
+  /* ===== Body layout ===== */
+  .body-grid{
+    display: grid;
+    grid-template-columns: 1fr 1px 1.15fr;
+    min-height: 480px;
+  }
+
+  .divider{ background: var(--line); }
+
+  /* ===== Input column ===== */
+  .inputs{
+    padding: 38px 44px;
+  }
+
+  .eyebrow{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 0 0 22px;
+  }
+
+  .unit-toggle{
+    display: inline-flex;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 3px;
+    margin-bottom: 30px;
+    background: var(--bg);
+  }
+
+  .unit-toggle button{
+    border: none;
+    background: transparent;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    padding: 7px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background .18s ease, color .18s ease;
+  }
+
+  .unit-toggle button.active{
+    background: var(--paper);
+    color: var(--teal-deep);
+    box-shadow: 0 1px 3px rgba(22,33,43,0.12);
+  }
+
+  .field{
+    margin-bottom: 28px;
+  }
+
+  .field-label{
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+  }
+
+  .field-label label{
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .field-value{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--teal-deep);
+  }
+
+  input[type="range"]{
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    background: var(--line);
+    border-radius: 2px;
+    outline: none;
+    margin: 4px 0 6px;
+  }
+
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 3px solid var(--teal);
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(22,33,43,0.25);
+    transition: transform .12s ease;
+  }
+
+  input[type="range"]::-webkit-slider-thumb:hover{ transform: scale(1.1); }
+
+  input[type="range"]::-moz-range-thumb{
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 3px solid var(--teal);
+    cursor: pointer;
+  }
+
+  .range-ticks{
+    display:flex;
+    justify-content: space-between;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    color: #94A3AB;
+  }
+
+  .num-row{
+    display:flex;
+    gap: 10px;
+    margin-top: 4px;
+  }
+
+  .num-row input[type="number"]{
+    width: 100%;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--ink);
+  }
+
+  .num-row input[type="number"]:focus{
+    outline: none;
+    border-color: var(--teal);
+    background: var(--paper);
+  }
+
+  .compute-btn{
+    width: 100%;
+    margin-top: 10px;
+    padding: 14px;
+    border: none;
+    border-radius: 9px;
+    background: var(--teal-deep);
+    color: #F5F7F8;
+    font-family: 'Inter', sans-serif;
+    font-size: 14.5px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+    transition: background .18s ease, transform .08s ease;
+  }
+
+  .compute-btn:hover{ background: var(--teal); }
+  .compute-btn:active{ transform: scale(0.99); }
+
+  /* ===== Reading column ===== */
+  .reading{
+    padding: 38px 44px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .readout-block{
+    text-align: left;
+    margin-bottom: 30px;
+  }
+
+  .readout-number{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 76px;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .readout-number .unit{
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    margin-top: 10px;
+  }
+
+  .category-tag{
+    display: inline-block;
+    margin-top: 14px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    background: rgba(14,111,108,0.1);
+    color: var(--teal-deep);
+    transition: background .25s ease, color .25s ease;
+  }
+
+  /* ===== Scale gauge (signature element) ===== */
+  .gauge-wrap{
+    margin-bottom: 28px;
+  }
+
+  .gauge-label-row{
+    display:flex;
+    justify-content: space-between;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+  }
+
+  .gauge-track{
+    position: relative;
+    height: 34px;
+    border-radius: 6px;
+    overflow: visible;
+    display: flex;
+    border: 1px solid var(--line);
+  }
+
+  .gauge-seg{
+    height: 100%;
+    position: relative;
+  }
+
+  .gauge-seg:first-child{ border-radius: 5px 0 0 5px; }
+  .gauge-seg:last-child{ border-radius: 0 5px 5px 0; }
+
+  .seg-under{ background: #DCEBF3; }
+  .seg-normal{ background: #DBEEE8; }
+  .seg-over{ background: #F7E7CE; }
+  .seg-obese{ background: #F5DAD3; }
+
+  .gauge-marker{
+    position: absolute;
+    top: -9px;
+    width: 3px;
+    height: 52px;
+    background: var(--ink);
+    border-radius: 2px;
+    transform: translateX(-50%);
+    transition: left .5s cubic-bezier(.22,1,.36,1);
+    left: 30%;
+  }
+
+  .gauge-marker::after{
+    content: attr(data-val);
+    position: absolute;
+    top: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+
+  .gauge-ticks{
+    display:flex;
+    justify-content: space-between;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: #9AA8AF;
+    margin-top: 8px;
+  }
+
+  .gauge-cats{
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .gauge-cats div{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    text-align: center;
+    color: var(--ink-soft);
+    padding-top: 8px;
+    border-top: 2px solid var(--line);
+  }
+
+  .gauge-cats div.active{
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .cat-under.active{ border-top-color: var(--under); }
+  .cat-normal.active{ border-top-color: var(--normal); }
+  .cat-over.active{ border-top-color: var(--over); }
+  .cat-obese.active{ border-top-color: var(--obese); }
+
+  /* ===== Notes / range panel ===== */
+  .notes{
+    margin-top: auto;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .note-item .note-label{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+  }
+
+  .note-item .note-val{
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    color: var(--ink);
+  }
+
+  /* ===== Diet plan section ===== */
+  .diet-section{
+    padding: 34px 44px 38px;
+    border-top: 1px solid var(--line);
+  }
+
+  .diet-grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 26px;
+  }
+
+  .diet-card{
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px 18px;
+    background: var(--bg);
+  }
+
+  .diet-card-label{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+  }
+
+  .diet-card-value{
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    color: var(--ink);
+    line-height: 1.25;
+  }
+
+  .diet-tips{
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 20px 22px;
+  }
+
+  .diet-tips-label{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+    margin-bottom: 12px;
+  }
+
+  .diet-tips ul{
+    margin: 0;
+    padding-left: 18px;
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 1.9;
+  }
+
+  .diet-tips li::marker{
+    color: var(--teal);
+  }
+
+  .diet-disclaimer{
+    margin: 18px 0 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    color: #9AA8AF;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 760px){
+    .diet-grid{ grid-template-columns: 1fr; }
+  }
+
+  /* ===== Footer strip ===== */
+  .footer-strip{
+    padding: 16px 44px;
+    border-top: 1px solid var(--line);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    color: #9AA8AF;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  @media (max-width: 760px){
+    .body-grid{ grid-template-columns: 1fr; }
+    .divider{ height: 1px; width: 100%; }
+    .masthead{ flex-direction: column; gap: 10px; }
+    .masthead .meta{ text-align: left; }
+    .readout-number{ font-size: 58px; }
+    .notes{ grid-template-columns: 1fr; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .gauge-marker{ transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sheet">
+
+  <div class="masthead">
+    <div class="brand">
+      <span class="brand-mark">BMI</span>
+      <h1>Body Mass Index Reading</h1>
+    </div>
+    <div class="meta">
+      REF. WHO ADULT SCALE<br>
+      UNITS: METRIC / IMPERIAL
+    </div>
+  </div>
+
+  <div class="body-grid">
+
+    <div class="inputs">
+      <p class="eyebrow">01 — Enter measurements</p>
+
+      <div class="unit-toggle" role="group" aria-label="Unit system">
+        <button type="button" id="btnMetric" class="active">Metric</button>
+        <button type="button" id="btnImperial">Imperial</button>
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          <label for="heightRange">Height</label>
+          <span class="field-value"><span id="heightVal">170</span><span id="heightUnit"> cm</span></span>
+        </div>
+        <input type="range" id="heightRange" min="120" max="220" value="170" step="1">
+        <div class="range-ticks"><span>120</span><span>170</span><span>220</span></div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          <label for="weightRange">Weight</label>
+          <span class="field-value"><span id="weightVal">68</span><span id="weightUnit"> kg</span></span>
+        </div>
+        <input type="range" id="weightRange" min="30" max="180" value="68" step="1">
+        <div class="range-ticks"><span>30</span><span>105</span><span>180</span></div>
+      </div>
+
+      <div class="field">
+        <div class="field-label"><label>Fine adjustment</label></div>
+        <div class="num-row">
+          <input type="number" id="heightNum" value="170" aria-label="Height exact value">
+          <input type="number" id="weightNum" value="68" aria-label="Weight exact value">
+        </div>
+      </div>
+
+      <button class="compute-btn" id="computeBtn">Calculate reading</button>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="reading">
+      <p class="eyebrow">02 — Result</p>
+
+      <div class="readout-block">
+        <div class="readout-number"><span id="bmiOut">23.5</span><span class="unit">kg/m²</span></div>
+        <span class="category-tag" id="catTag">Normal range</span>
+      </div>
+
+      <div class="gauge-wrap">
+        <div class="gauge-label-row"><span>15</span><span>SCALE</span><span>40</span></div>
+        <div class="gauge-track">
+          <div class="gauge-seg seg-under" style="width:14%"></div>
+          <div class="gauge-seg seg-normal" style="width:26%"></div>
+          <div class="gauge-seg seg-over" style="width:20%"></div>
+          <div class="gauge-seg seg-obese" style="width:40%"></div>
+          <div class="gauge-marker" id="gaugeMarker" data-val="23.5"></div>
+        </div>
+        <div class="gauge-cats">
+          <div class="cat-under" id="catUnder">Underweight<br>&lt;18.5</div>
+          <div class="cat-normal" id="catNormal">Normal<br>18.5–24.9</div>
+          <div class="cat-over" id="catOver">Overweight<br>25–29.9</div>
+          <div class="cat-obese" id="catObese">Obese<br>≥30</div>
+        </div>
+      </div>
+
+      <div class="notes">
+        <div class="note-item">
+          <div class="note-label">Healthy weight range</div>
+          <div class="note-val" id="healthyRange">53.5 – 72.1 kg</div>
+        </div>
+        <div class="note-item">
+          <div class="note-label">Distance to normal</div>
+          <div class="note-val" id="distanceOut">Within range</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="diet-section">
+    <p class="eyebrow">03 — Suggested nutrition direction</p>
+
+    <div class="diet-grid">
+      <div class="diet-card">
+        <div class="diet-card-label">Goal</div>
+        <div class="diet-card-value" id="dietGoal">Maintain weight</div>
+      </div>
+      <div class="diet-card">
+        <div class="diet-card-label">Estimated daily calories</div>
+        <div class="diet-card-value" id="dietCalories">—</div>
+      </div>
+      <div class="diet-card">
+        <div class="diet-card-label">Suggested pace</div>
+        <div class="diet-card-value" id="dietPace">—</div>
+      </div>
+    </div>
+
+    <div class="diet-tips">
+      <div class="diet-tips-label">Food focus</div>
+      <ul id="dietTips"></ul>
+    </div>
+
+    <p class="diet-disclaimer">General wellness information only, generated from a simple population-average estimate — not a personalized medical or nutrition plan. Individual needs vary with age, sex, activity level, and health history. Consult a registered dietitian or doctor before making significant changes to your diet.</p>
+  </div>
+
+  <div class="footer-strip">
+    <span>NOT A DIAGNOSTIC TOOL</span>
+    <span id="timestamp">—</span>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  const heightRange = document.getElementById('heightRange');
+  const weightRange = document.getElementById('weightRange');
+  const heightNum = document.getElementById('heightNum');
+  const weightNum = document.getElementById('weightNum');
+  const heightVal = document.getElementById('heightVal');
+  const weightVal = document.getElementById('weightVal');
+  const heightUnit = document.getElementById('heightUnit');
+  const weightUnit = document.getElementById('weightUnit');
+  const btnMetric = document.getElementById('btnMetric');
+  const btnImperial = document.getElementById('btnImperial');
+  const bmiOut = document.getElementById('bmiOut');
+  const catTag = document.getElementById('catTag');
+  const gaugeMarker = document.getElementById('gaugeMarker');
+  const healthyRange = document.getElementById('healthyRange');
+  const distanceOut = document.getElementById('distanceOut');
+  const computeBtn = document.getElementById('computeBtn');
+  const timestamp = document.getElementById('timestamp');
+  const dietGoal = document.getElementById('dietGoal');
+  const dietCalories = document.getElementById('dietCalories');
+  const dietPace = document.getElementById('dietPace');
+  const dietTips = document.getElementById('dietTips');
+
+  const catEls = {
+    under: document.getElementById('catUnder'),
+    normal: document.getElementById('catNormal'),
+    over: document.getElementById('catOver'),
+    obese: document.getElementById('catObese')
+  };
+
+  let unit = 'metric'; // metric: cm/kg, imperial: in/lb
+
+  function cmToIn(cm){ return cm / 2.54; }
+  function inToCm(inch){ return inch * 2.54; }
+  function kgToLb(kg){ return kg * 2.20462; }
+  function lbToKg(lb){ return lb / 2.20462; }
+
+  function setUnit(newUnit){
+    if(unit === newUnit) return;
+
+    let hCm = unit === 'metric' ? parseFloat(heightRange.value) : inToCm(parseFloat(heightRange.value));
+    let wKg = unit === 'metric' ? parseFloat(weightRange.value) : lbToKg(parseFloat(weightRange.value));
+
+    unit = newUnit;
+
+    if(unit === 'metric'){
+      heightRange.min = 120; heightRange.max = 220; heightRange.value = Math.round(hCm);
+      weightRange.min = 30; weightRange.max = 180; weightRange.value = Math.round(wKg);
+      heightUnit.textContent = ' cm';
+      weightUnit.textContent = ' kg';
+      btnMetric.classList.add('active');
+      btnImperial.classList.remove('active');
+    } else {
+      heightRange.min = 47; heightRange.max = 87; heightRange.value = Math.round(cmToIn(hCm));
+      weightRange.min = 66; weightRange.max = 400; weightRange.value = Math.round(kgToLb(wKg));
+      heightUnit.textContent = ' in';
+      weightUnit.textContent = ' lb';
+      btnImperial.classList.add('active');
+      btnMetric.classList.remove('active');
+    }
+
+    heightNum.value = heightRange.value;
+    weightNum.value = weightRange.value;
+    syncLabels();
+    calculate();
+  }
+
+  function syncLabels(){
+    heightVal.textContent = heightRange.value;
+    weightVal.textContent = weightRange.value;
+  }
+
+  function getMetricValues(){
+    let hCm, wKg;
+    if(unit === 'metric'){
+      hCm = parseFloat(heightRange.value);
+      wKg = parseFloat(weightRange.value);
+    } else {
+      hCm = inToCm(parseFloat(heightRange.value));
+      wKg = lbToKg(parseFloat(weightRange.value));
+    }
+    return {hCm, wKg};
+  }
+
+  function categoryOf(bmi){
+    if(bmi < 18.5) return 'under';
+    if(bmi < 25) return 'normal';
+    if(bmi < 30) return 'over';
+    return 'obese';
+  }
+
+  const catNames = {
+    under: 'Underweight',
+    normal: 'Normal range',
+    over: 'Overweight',
+    obese: 'Obese'
+  };
+
+  const dietTipSets = {
+    under: [
+      'Add calorie-dense, nutrient-rich foods: nuts, nut butters, avocado, olive oil.',
+      'Include a protein source at every meal (eggs, dairy, legumes, poultry, fish).',
+      'Favor whole grains and starchy sides (rice, oats, potatoes) over low-calorie fillers.',
+      'Try smoothies with milk, oats, fruit and nut butter as an easy way to add calories.',
+      'Eat more frequently — 5–6 smaller meals can be easier than 3 large ones.'
+    ],
+    normal: [
+      'Keep a balanced plate: roughly half vegetables, a quarter protein, a quarter whole grains.',
+      'Stay consistent with meal timing and hydration through the day.',
+      'Limit ultra-processed foods and added sugar, without cutting out food groups.',
+      'Include regular movement — strength and cardio — to maintain body composition.',
+      'Reassess every few weeks rather than reacting to daily weight fluctuations.'
+    ],
+    over: [
+      'Fill half your plate with vegetables and fiber-rich foods to support fullness.',
+      'Choose lean protein (fish, poultry, legumes, tofu) at each meal.',
+      'Reduce portions of refined carbs and sugary drinks rather than eliminating them.',
+      'Practice mindful, slower eating and stop near comfortable fullness.',
+      'Add regular activity — brisk walking most days is a strong starting point.'
+    ],
+    obese: [
+      'Prioritize whole, minimally processed foods: vegetables, fruit, lean protein, whole grains.',
+      'Use portion control (smaller plates, measured servings) instead of strict elimination.',
+      'Cut back on sugary drinks and calorie-dense snacks first — they add up fastest.',
+      'Build up gentle, regular movement (walking, swimming) and increase gradually.',
+      'A structured plan from a doctor or registered dietitian is strongly recommended at this range.'
+    ]
+  };
+
+  function updateDietPlan(cat, bmi, wKg, hM){
+    // Rough population-average maintenance estimate (no age/sex/activity collected)
+    const maintenance = wKg * 30;
+    let goalText, calorieText, paceText, floor;
+
+    if(cat === 'under'){
+      goalText = 'Gain weight';
+      const target = maintenance + 400;
+      calorieText = '≈ ' + Math.round(target) + ' kcal/day';
+      paceText = '+0.3–0.5 kg / week';
+    } else if(cat === 'normal'){
+      goalText = 'Maintain weight';
+      calorieText = '≈ ' + Math.round(maintenance) + ' kcal/day';
+      paceText = 'Stay within ±2 kg';
+    } else if(cat === 'over'){
+      goalText = 'Reduce weight gradually';
+      floor = 1300;
+      const target = Math.max(maintenance - 450, floor);
+      calorieText = '≈ ' + Math.round(target) + ' kcal/day';
+      paceText = '−0.3–0.5 kg / week';
+    } else {
+      goalText = 'Reduce weight with guidance';
+      floor = 1300;
+      const target = Math.max(maintenance - 500, floor);
+      calorieText = '≈ ' + Math.round(target) + ' kcal/day';
+      paceText = '−0.5–0.7 kg / week';
+    }
+
+    dietGoal.textContent = goalText;
+    dietCalories.textContent = calorieText;
+    dietPace.textContent = paceText;
+
+    dietTips.innerHTML = '';
+    dietTipSets[cat].forEach(tip => {
+      const li = document.createElement('li');
+      li.textContent = tip;
+      dietTips.appendChild(li);
+    });
+  }
+
+  function calculate(){
+    const {hCm, wKg} = getMetricValues();
+    const hM = hCm / 100;
+    const bmi = wKg / (hM * hM);
+    const bmiRounded = Math.round(bmi * 10) / 10;
+
+    bmiOut.textContent = bmiRounded.toFixed(1);
+
+    const cat = categoryOf(bmi);
+    catTag.textContent = catNames[cat];
+
+    Object.keys(catEls).forEach(k => catEls[k].classList.toggle('active', k === cat));
+
+    updateDietPlan(cat, bmi, wKg, hM);
+
+    // marker position across visual scale 15 - 40
+    const clamped = Math.min(Math.max(bmi, 15), 40);
+    const pct = ((clamped - 15) / (40 - 15)) * 100;
+    gaugeMarker.style.left = pct + '%';
+    gaugeMarker.setAttribute('data-val', bmiRounded.toFixed(1));
+
+    // healthy weight range in current unit
+    const lowKg = 18.5 * hM * hM;
+    const highKg = 24.9 * hM * hM;
+    if(unit === 'metric'){
+      healthyRange.textContent = lowKg.toFixed(1) + ' – ' + highKg.toFixed(1) + ' kg';
+    } else {
+      healthyRange.textContent = kgToLb(lowKg).toFixed(0) + ' – ' + kgToLb(highKg).toFixed(0) + ' lb';
+    }
+
+    if(bmi < 18.5){
+      const diffKg = lowKg - wKg;
+      const diff = unit === 'metric' ? diffKg.toFixed(1) + ' kg' : kgToLb(diffKg).toFixed(0) + ' lb';
+      distanceOut.textContent = '+' + diff + ' to reach normal';
+    } else if(bmi > 24.9){
+      const diffKg = wKg - highKg;
+      const diff = unit === 'metric' ? diffKg.toFixed(1) + ' kg' : kgToLb(diffKg).toFixed(0) + ' lb';
+      distanceOut.textContent = '−' + diff + ' to reach normal';
+    } else {
+      distanceOut.textContent = 'Within range';
+    }
+
+    const now = new Date();
+    timestamp.textContent = 'READ AT ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+  }
+
+  heightRange.addEventListener('input', () => {
+    heightNum.value = heightRange.value;
+    syncLabels();
+    calculate();
+  });
+
+  weightRange.addEventListener('input', () => {
+    weightNum.value = weightRange.value;
+    syncLabels();
+    calculate();
+  });
+
+  heightNum.addEventListener('input', () => {
+    let v = parseFloat(heightNum.value);
+    if(isNaN(v)) return;
+    v = Math.min(Math.max(v, parseFloat(heightRange.min)), parseFloat(heightRange.max));
+    heightRange.value = v;
+    syncLabels();
+    calculate();
+  });
+
+  weightNum.addEventListener('input', () => {
+    let v = parseFloat(weightNum.value);
+    if(isNaN(v)) return;
+    v = Math.min(Math.max(v, parseFloat(weightRange.min)), parseFloat(weightRange.max));
+    weightRange.value = v;
+    syncLabels();
+    calculate();
+  });
+
+  btnMetric.addEventListener('click', () => setUnit('metric'));
+  btnImperial.addEventListener('click', () => setUnit('imperial'));
+  computeBtn.addEventListener('click', calculate);
+
+  syncLabels();
+  calculate();
+})();
+</script>
+
+</body>
+</html>
